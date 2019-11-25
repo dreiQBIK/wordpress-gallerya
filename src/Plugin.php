@@ -58,6 +58,12 @@ class Plugin {
     if (static::isPluginActive('woocommerce/woocommerce.php')) {
       apply_filters('bjll/skip_classes', __CLASS__ . '::bjll_skip_classes');
     }
+
+    // Adds thumbnail slider with variation images to products on listing pages.
+    remove_action( 'woocommerce_before_shop_loop_item_title', 'woocommerce_template_loop_product_thumbnail', 10 );
+    add_action( 'woocommerce_before_shop_loop_item_title', __NAMESPACE__ . '\WooCommerce::woocommerce_template_loop_product_thumbnail', 10 );
+
+
   }
 
   /**
