@@ -13,6 +13,29 @@ namespace Netzstrategen\Gallerya;
 class WooCommerce {
 
   /**
+   * Adds woocommerce specific settings.
+   *
+   * @implements woocommerce_get_settings_gallerya
+   */
+  public static function woocommerce_get_settings_gallerya(array $settings): array {
+    $settings[] = [
+      'type' => 'title',
+      'name' => __('Product variation slider settings', Plugin::L10N),
+    ];
+    $settings[] = [
+      'type' => 'checkbox',
+      'id' => '_' . Plugin::L10N . '_product_variation_slider_enabled',
+      'name' => __('Enable thumbnails slider on product listing pages', Plugin::L10N),
+    ];
+    $settings[] = [
+      'type' => 'sectionend',
+      'id' => Plugin::L10N,
+    ];
+    return $settings;
+  }
+
+
+  /**
    * Adds data-srcset and data-sizes attributes to the wrapper to make images reponsive in lightGallery.
    *
    * Also adds data-sizes attributes to the image wrapper, so images are not
@@ -35,15 +58,10 @@ class WooCommerce {
    */
   public static function woocommerce_template_loop_product_thumbnail() {
     global $product;
+    $render_slider = FALSE;
+    $attachment_ids = [];
 
     if ($product->is_type('variable')) {
-
-      // TODO: Make sure the Sale labels etc are still working.
-
-      // TODO: Set pageDots=false in JS
-
-      $attachment_ids = [];
-
       // Get the main product image.
       $attachment_ids[] = $product->get_image_id();
 
@@ -52,17 +70,19 @@ class WooCommerce {
       foreach ($variations as $variation) {
         $attachment_ids[] = $variation['image_id'];
       }
-
+      $attachment_ids = array_unique($attachment_ids);
 
       if (count($attachment_ids) > 1) {
         // TODO: Remove wrapping product link if we have multiple images.
-
         // Needs to be done through removing and re-adding hooks in Plugin.php:
         // woocommerce_template_loop_product_link_open() needs to be removed from woocommerce_before_shop_loop_item
         // and re-added to woocommerce_bevore_shop_look_item_title with low priority like 20
 
+        $render_slider = TRUE;
       }
+    }
 
+    if ($render_slider) {
       $args['post_type'] = 'attachment';
       $args['include'] = $attachment_ids;
       $args['orderby'] = 'post__in';
@@ -70,10 +90,9 @@ class WooCommerce {
       Plugin::renderTemplate(['templates/layout-product-variation-slider.php'], [
         'images' => get_posts($args),
       ]);
-
     }
     else {
-      // This isn't a variable product, output default thumbnail markup.
+      // This either has no more than one thumbnail or isn't a variable product, output default thumbnail markup.
       echo woocommerce_get_product_thumbnail();
     }
   }

@@ -46,6 +46,17 @@ class Plugin {
     add_filter('post_gallery', __CLASS__ . '::post_gallery', 10, 2);
     add_action('print_media_templates', __CLASS__ . '::print_media_templates');
 
+    // Adds woocommerce specific settings.
+    if (static::isPluginActive('woocommerce/woocommerce.php')) {
+      add_filter('woocommerce_get_settings_gallerya', __NAMESPACE__ . '\WooCommerce::woocommerce_get_settings_gallerya');
+    }
+
+    // Adds thumbnail slider with variation images to products on listing pages.
+    if (static::isPluginActive('woocommerce/woocommerce.php') && get_option('_' . Plugin::L10N . '_product_variation_slider_enabled') === 'yes') {
+      remove_action( 'woocommerce_before_shop_loop_item_title', 'woocommerce_template_loop_product_thumbnail', 10 );
+      add_action( 'woocommerce_before_shop_loop_item_title', __NAMESPACE__ . '\WooCommerce::woocommerce_template_loop_product_thumbnail', 10 );
+    }
+
     // Adds data-srcset attributes to image links to make them reponsive in lightGallery.
     // @todo Make lightGallery properly respect srcset & sizes in JavaScript instead
     //   of duplicating that information in HTML; see
@@ -58,11 +69,6 @@ class Plugin {
     if (static::isPluginActive('woocommerce/woocommerce.php')) {
       apply_filters('bjll/skip_classes', __CLASS__ . '::bjll_skip_classes');
     }
-
-    // Adds thumbnail slider with variation images to products on listing pages.
-    remove_action( 'woocommerce_before_shop_loop_item_title', 'woocommerce_template_loop_product_thumbnail', 10 );
-    add_action( 'woocommerce_before_shop_loop_item_title', __NAMESPACE__ . '\WooCommerce::woocommerce_template_loop_product_thumbnail', 10 );
-
 
   }
 

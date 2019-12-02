@@ -15,10 +15,10 @@ $color-secondary: #c4c4c4;
   &--grid {
 
     > ul {
-
       &:after {
-        content: 'flickity';
-        display: none;
+        // Prevent this from being overriden by clearfixes through using !important.
+        content: 'flickity' !important;
+        display: none !important;
       }
     }
   }
@@ -40,10 +40,9 @@ $color-secondary: #c4c4c4;
 
       li {
         width: 100%;
-        top: 50%;
-        transform: translateY(-50%);
       }
     }
+
 
     .gallerya__image {
       @media screen and (min-width: $screen-sm-min) {
@@ -60,6 +59,13 @@ $color-secondary: #c4c4c4;
     @media screen and (min-width: $screen-sm-min) {
       margin-top: 50px;
       margin-bottom: 75px;
+    }
+
+    > ul {
+      li {
+        top: 50%;
+        transform: translateY(-50%);
+      }
     }
 
     .gallerya__image {
@@ -113,6 +119,26 @@ $color-secondary: #c4c4c4;
   }
 
   &--product-variation-slider {
+    width: 100%;
+
+    // Hide all slides but first before Flickity is initialized to prevent reflows.
+    li:not(:first-of-type) {
+      display: none;
+    }
+    .flickity-enabled {
+      li:not(:first-of-type) {
+        display: block;
+      }
+    }
+
+    .flickity {
+      white-space: nowrap;
+      overflow: visible;
+
+      li {
+        display: inline-block;
+      }
+    }
 
   }
 
