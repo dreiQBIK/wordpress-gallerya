@@ -138,8 +138,19 @@ $color-secondary: #c4c4c4;
       li {
         display: inline-block;
       }
-    }
 
+      &-prev-next-button {
+        @media screen and (min-width: $screen-sm-min) {
+          &.previous {
+            left: 10px;
+          }
+
+          &.next {
+            right: 10px;
+          }
+        }
+      }
+    }
   }
 
   &--grid {
